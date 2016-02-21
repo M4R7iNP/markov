@@ -1,0 +1,15 @@
+{
+  "name": "markov-bonansa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "markov.js",
+  "scripts": {
+    "test": "mocha --harmony test.js"
+  },
+  "author": "Martin Pedersen",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^1.5.2",
+    "pg": "^4.4.6"
+  }
+}
