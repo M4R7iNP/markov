@@ -5,7 +5,7 @@ var Markov = require('./markov'),
 var markov = new Markov();
 
 it('should index without fail', function(done) {
-    async.eachSeries(
+    async.each(
         [
             'Martin er kul',
             'Martin er smart',

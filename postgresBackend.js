@@ -27,26 +27,46 @@ class PostgresBackend {
     }
 
     insertWord(key, direction, word, cb) {
+        this.insertWords(
+            [ {key, direction, word} ],
+            cb
+        );
+    }
+
+    insertWords(words, cb) {
+        var i = 1;
         this.pg.query(
             `
             INSERT INTO
             markov (
                 key, direction, word, weight
             )
-            VALUES (
-                $1, $2, $3, 1
-            )
+            VALUES
+                ${words.map(() => `(
+                    $${i++},
+                    $${i++},
+                    $${i++},
+                    $${i++}
+                )`).join(', ')}
             ON CONFLICT ON CONSTRAINT markov_pkey
             DO UPDATE SET
                 weight = markov.weight + EXCLUDED.weight;
             `,
-            [
-                key,
-                direction,
-                word
-            ],
-            (err, result) =>
-                cb(err)
+            words.reduce(
+                (carry, item) =>
+                    carry.concat([
+                        item.key,
+                        item.direction,
+                        item.word,
+                        item.weight
+                    ]),
+                []
+            ),
+            (err, result) => {
+                if (err)
+                    console.log(sql);
+                cb(err);
+            }
         );
     }
 

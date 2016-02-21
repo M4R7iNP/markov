@@ -21,38 +21,55 @@ class Markov {
     /*
      * Indexing function
      */
-    seed(text, callback) {
+    seed(text, cb) {
         var words = text.split(/\s+/),
-            queries = [];
+            insertWords = {};
 
+        // For every word..
         for (let i = 0, len = words.length; i < len; i++)
         {
             var key = words[i];
 
-            if (i > this.order) { // index prev
-                var prev = words[i - this.order];
-                queries.push(
-                    this.backend.insertWord.bind(
-                        this.backend, key, 'prev', prev
-                    )
-                );
+            // .. index the previous word
+            if (i >= this.order) {
+                let prev = words[i - this.order],
+                    k = [key, 'prev', prev].join('_');
+
+                if (k in insertWords)
+                    insertWords[k].weight++;
+                else
+                    insertWords[k] = {
+                        key,
+                        direction: 'prev',
+                        word: prev,
+                        weight: 1
+                    };
             }
 
-            if (i + this.order < len) { // index next
-                var next = words[i + this.order];
-                queries.push(
-                    this.backend.insertWord.bind(
-                        this.backend, key, 'next', next
-                    )
-                );
+            // .. and the next word
+            if (i + this.order < len) {
+                let next = words[i + this.order],
+                    k = [key, 'next', next].join('_');
+
+                if (k in insertWords)
+                    insertWords[k].weight++;
+                else
+                    insertWords[k] = {
+                        key,
+                        direction: 'next',
+                        word: next,
+                        weight: 1
+                    };
             }
         }
 
-        // TODO: maybe use parallel here
-        async.series(
-            queries,
-            callback
-        );
+        // Transform object into array
+        insertWords = Object.keys(insertWords).map((key) => insertWords[key]);
+
+        if (!insertWords.length)
+            return cb();
+
+        this.backend.insertWords(insertWords, cb);
     }
 
     prev(word, cb) {
