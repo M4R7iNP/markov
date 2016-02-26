@@ -1,21 +1,16 @@
 var async = require('async');
+var PostgresBackend = require('./postgresBackend');
 
 class Markov {
-    constructor(order, backend) {
-        if (order === undefined) {
+    constructor(order, namespace) {
+        if (order === undefined)
             order = 1;
-        }
 
-        if (order !== 1)
-            throw new Error('Only 1. order markov is supported');
-
-        if (backend === undefined) {
-            var PostgresBackend = require('./postgresBackend');
-            backend = new PostgresBackend(process.env.CONN_STRING);
-        }
+        if (namespace === undefined)
+            namespace = 'default';
 
         this.order = order;
-        this.backend = backend;
+        this.backend = new PostgresBackend(process.env.CONN_STRING, namespace);
     }
 
     /*
@@ -28,17 +23,18 @@ class Markov {
         // For every word..
         for (let i = 0, len = words.length; i < len; i++)
         {
-            var key = words[i];
+            var key = words.slice(i, i + this.order).join(' ');
 
             // .. index the previous word
             if (i >= this.order) {
-                let prev = words[i - this.order],
+                let prev = words.slice(i - this.order, i).join(' '),
                     k = [key, 'prev', prev].join('_');
 
                 if (k in insertWords)
                     insertWords[k].weight++;
                 else
                     insertWords[k] = {
+                        order: this.order,
                         key,
                         direction: 'prev',
                         word: prev,
@@ -48,13 +44,14 @@ class Markov {
 
             // .. and the next word
             if (i + this.order < len) {
-                let next = words[i + this.order],
+                let next = words.slice(i + this.order, i + this.order * 2).join(' '),
                     k = [key, 'next', next].join('_');
 
                 if (k in insertWords)
                     insertWords[k].weight++;
                 else
                     insertWords[k] = {
+                        order: this.order,
                         key,
                         direction: 'next',
                         word: next,
@@ -73,10 +70,10 @@ class Markov {
     }
 
     prev(word, cb) {
-        this.backend.pick(word, 'prev', cb);
+        this.backend.pick(word, 'prev', this.order, cb);
     }
     next(word, cb) {
-        this.backend.pick(word, 'next', cb);
+        this.backend.pick(word, 'next', this.order, cb);
     }
 
     backward(word, limit, callback) {
@@ -133,7 +130,7 @@ class Markov {
      * Returns a random word
      */
     pick(cb) {
-        this.backend.pickRandomWord(cb);
+        this.backend.pickRandomWord(this.order, cb);
     }
 
     /*

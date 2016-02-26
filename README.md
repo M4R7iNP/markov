@@ -12,3 +12,4 @@ This project aims to be very Postgres centered, so that we can run several index
 ### TODO:
 * Support several «orders» (WIP)
 * Look for performance improvements (indexing 100 Tek.no headlines currently takes 6 seconds. Now imagine a whole article. Ohboy…)
+* Implement some sort of «word variance» system («Cool», «cool» and «cool.» are all different words at the moment)
