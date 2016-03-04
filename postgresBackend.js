@@ -150,11 +150,15 @@ class PostgresBackend {
                 $2 < cumm_weight
                 LIMIT 1;
             `,
-            [ order, Math.random() ],
+            [ order, this.getRandomDecimal() ],
             function(err, result) {
                 cb(err, result ? result.key : undefined);
             }
         );
+    }
+
+    getRandomDecimal() {
+        return Math.random().toString() + Math.random().toString().substr(-2);
     }
 }
 

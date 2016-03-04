@@ -23,40 +23,44 @@ class Markov {
         // For every word..
         for (let i = 0, len = words.length; i < len; i++)
         {
-            var key = words.slice(i, i + this.order).join(' ');
+            let key = words.slice(i, i + this.order).join(' ');
 
             // .. index the previous word
-            if (i >= this.order) {
-                let prev = words.slice(i - this.order, i).join(' '),
-                    k = [key, 'prev', prev].join('_');
+            let prev = (i >= 1 ?
+                    words.slice(Math.max(0, i - this.order), i).join(' ') :
+                    undefined),
+                prevKey = [key, 'prev', prev].join('_');
 
-                if (k in insertWords)
-                    insertWords[k].weight++;
-                else
-                    insertWords[k] = {
-                        order: this.order,
-                        key,
-                        direction: 'prev',
-                        word: prev,
-                        weight: 1
-                    };
+            if (prevKey in insertWords) {
+                insertWords[prevKey].weight++;
+            }
+            else {
+                insertWords[prevKey] = {
+                    order: this.order,
+                    key,
+                    direction: 'prev',
+                    word: prev,
+                    weight: 1
+                };
             }
 
             // .. and the next word
-            if (i + this.order < len) {
-                let next = words.slice(i + this.order, i + this.order * 2).join(' '),
-                    k = [key, 'next', next].join('_');
+            let next = (i + this.order < len ?
+                    words.slice(i + this.order, i + this.order * 2).join(' ') :
+                    undefined),
+                nextKey = [key, 'next', next].join('_');
 
-                if (k in insertWords)
-                    insertWords[k].weight++;
-                else
-                    insertWords[k] = {
-                        order: this.order,
-                        key,
-                        direction: 'next',
-                        word: next,
-                        weight: 1
-                    };
+            if (nextKey in insertWords) {
+                insertWords[nextKey].weight++;
+            }
+            else {
+                insertWords[nextKey] = {
+                    order: this.order,
+                    key,
+                    direction: 'next',
+                    word: next,
+                    weight: 1
+                };
             }
         }
 
