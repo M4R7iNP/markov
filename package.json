@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.1.4",
-    "pg": "^6.1.2",
+    "pg": "^6.1.2"
+  },
+  "optionalDependencies": {
     "pg-native": "^1.10.0"
   }
 }

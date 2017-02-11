@@ -1,4 +1,5 @@
-var PostgresClient = require('pg').native.Client;
+const Pg = require('pg'),
+    PostgresClient = (Pg.native || Pg).Client;
 
 class PostgresBackend {
     constructor(namespace) {
