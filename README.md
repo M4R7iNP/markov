@@ -1,4 +1,4 @@
-# Markov chain in Nodejs with Postgresql
+# Markov chain in Nodejs and Postgresql [![Build Status](https://travis-ci.org/M4R7iNP/markov.svg?branch=master)](https://travis-ci.org/M4R7iNP/markov)
 
 This project aims to be very Postgres centered, so that we can run several indexing processes at the same time. Just keep track of which process indexed what, and this should be lightning fast.
 
