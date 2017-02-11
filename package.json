@@ -14,5 +14,8 @@
   },
   "optionalDependencies": {
     "pg-native": "^1.10.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.2.0"
   }
 }
