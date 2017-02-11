@@ -1,4 +1,4 @@
-var PostgresClient = require('pg').Client;
+var PostgresClient = require('pg').native.Client;
 
 class PostgresBackend {
     constructor(connString, namespace) {
@@ -35,6 +35,9 @@ class PostgresBackend {
     }
 
     insertWords(words, cb) {
+        if (!words.length)
+            return cb();
+
         var i = 1;
         this.pg.query(
             `
@@ -83,8 +86,6 @@ class PostgresBackend {
             order = 1;
         }
 
-        var random = Math.random();
-
         this.queryRow(
             `
             SELECT
@@ -93,7 +94,7 @@ class PostgresBackend {
                 SELECT
                     word,
                     (
-                        sum(weight) OVER (ORDER BY weight, word)::decimal /
+                        sum(weight) OVER (ORDER BY word)::decimal /
                         sum(weight) OVER (PARTITION BY key)
                     ) AS cumm_weight
                 FROM
@@ -108,7 +109,7 @@ class PostgresBackend {
                 $4 < cumm_weight
                 LIMIT 1;
             `,
-            [ key, order, direction, random ],
+            [ key, order, direction, this.getRandomDecimal() ],
             (err, result) =>
                 cb(err, result ? result.word : undefined)
         );
@@ -118,10 +119,28 @@ class PostgresBackend {
      * Picks a random key from the db
      * TODO: maybe create a cache table
      */
-    pickRandomWord(order, cb) {
-        if (typeof order == 'function') {
-            cb = order;
-            order = 1;
+    pickRandomWord(opts, cb) {
+        if (typeof opts == 'function') {
+            cb = opts;
+            opts = {
+                order: 1
+            };
+        }
+        else if (typeof opts == 'number') {
+            opts = {
+                order: opts
+            };
+        }
+
+        var queryParams = [ opts.order, this.getRandomDecimal() ],
+            hasTokens = opts.tokens && opts.tokens.length;
+
+        if (hasTokens) {
+            queryParams.push(opts.tokens)
+        }
+
+        if (opts.match) {
+            queryParams.push(opts.match)
         }
 
         this.queryRow(
@@ -142,15 +161,17 @@ class PostgresBackend {
                         WHERE
                             namespace = '${this.namespace}' AND
                             markov_order = $1
+                            ${hasTokens ? " AND key = ANY ( $3 ) " : ''}
+                            ${opts.match ? " AND to_tsvector('english', key) @@ to_tsquery('english', $3) " : ''}
                         GROUP BY
                             key
                     ) a
                 ) result
             WHERE
-                $2 < cumm_weight
+                $2 <= cumm_weight
                 LIMIT 1;
             `,
-            [ order, this.getRandomDecimal() ],
+            queryParams,
             function(err, result) {
                 cb(err, result ? result.key : undefined);
             }

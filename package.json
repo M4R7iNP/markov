@@ -9,7 +9,8 @@
   "author": "Martin Pedersen",
   "license": "ISC",
   "dependencies": {
-    "async": "^1.5.2",
-    "pg": "^4.4.6"
+    "async": "^2.1.4",
+    "pg": "^6.1.2",
+    "pg-native": "^1.10.0"
   }
 }

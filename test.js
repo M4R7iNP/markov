@@ -154,8 +154,8 @@ describe(`2. order markov chain`, function() {
         });
     })
 
-    it('should do backwards too', function(done) {
-        markov.backward('best', 2, function(err, words) {
+    it('should do «er best» backwards', function(done) {
+        markov.backward('er best', 2, function(err, words) {
             if (err)
                 throw err;
 
@@ -172,6 +172,17 @@ describe(`2. order markov chain`, function() {
 
             var answer = words.join(' ');
             assert(MartinErBestRegex.test(answer));
+            done();
+        });
+    })
+
+    it('should respond to sentence', function(done) {
+        markov.respondToSentence('Trololo er best', 3, function(err, words) {
+            if (err)
+                throw err;
+
+            var answer = words.join(' ');
+            assert.equal(answer, 'Martin er best');
             done();
         });
     })

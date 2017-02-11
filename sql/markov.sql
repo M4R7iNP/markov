@@ -10,4 +10,5 @@ CREATE TABLE markov (
 );
 
 CREATE UNIQUE INDEX markov_pkey ON markov (namespace, markov_order, key, direction, word);
+CREATE INDEX markov_text_search ON markov USING gin (to_tsvector('english', key));
 ALTER TABLE markov ADD CONSTRAINT markov_pkey UNIQUE USING INDEX markov_pkey;
