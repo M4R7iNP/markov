@@ -11,10 +11,4 @@ addons:
   postgresql: "9.6"
 
 before_script:
-  - echo "create database markov_test;" | psql -U postgres
-  - cat sql/markov.sql | psql -U postgres markov_test
-
-env:
-  - PGUSER=postgres
-  - PGHOST=/var/run/postgresql
-  - PGDATABASE=markov_test
+  - cat sql/markov.sql | psql
