@@ -1,8 +1,8 @@
 var PostgresClient = require('pg').native.Client;
 
 class PostgresBackend {
-    constructor(connString, namespace) {
-        this.pg = new PostgresClient(connString);
+    constructor(namespace) {
+        this.pg = new PostgresClient();
         this.namespace = namespace;
         this.pg.connect(function(err) {
             if (err)
@@ -180,6 +180,10 @@ class PostgresBackend {
 
     getRandomDecimal() {
         return Math.random().toString() + Math.random().toString().substr(-2);
+    }
+
+    end(cb) {
+        this.pg.end(cb);
     }
 }
 

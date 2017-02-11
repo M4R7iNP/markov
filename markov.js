@@ -10,7 +10,7 @@ class Markov {
             namespace = 'default';
 
         this.order = order;
-        this.backend = new PostgresBackend(process.env.CONN_STRING, namespace);
+        this.backend = new PostgresBackend(namespace);
     }
 
     tokenize(text) {
@@ -211,8 +211,8 @@ class Markov {
      * Terminates backend connection
      */
     end(cb) {
-        if (this.backend instanceof PostgresBackend) {
-            this.backend.pg.end(cb);
+        if (this.backend.end) {
+            this.backend.end(cb);
         }
     }
 };

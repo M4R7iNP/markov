@@ -8,8 +8,8 @@ This project aims to be very Postgres centered, so that we can run several index
 * Something to index :closed_book:
 * Patience :persevere:
 
-----
-### TODO:
-* Support several «orders» (WIP)
-* Look for performance improvements (indexing 100 Tek.no headlines currently takes 6 seconds. Now imagine a whole article. Ohboy…)
-* Implement some sort of «word variance» system («Cool», «cool» and «cool.» are all different words at the moment)
+### Postgresql performance
+* Turn off `synchronous_commit` if you can.
+* Increase your usual settings like `shared_buffers` and `work_mem`.
+* One instance of Markov runs _one_ Postgresql connection. Either run multiple instances or switch to [node pg pooling](https://github.com/brianc/node-postgres#client-pooling).
+* You can remove the fulltext index while inserting your data.
