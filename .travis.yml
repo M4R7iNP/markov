@@ -3,6 +3,8 @@ node_js:
   - "6"
   - "5"
 
+dist: trusty
+
 services:
   - postgresql
 addons:
